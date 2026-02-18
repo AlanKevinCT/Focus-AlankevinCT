@@ -8,6 +8,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+/**
+ * @author <a href=alan.kevin@ciencias.unam.mx> Alan Kevin Cano Tenorio - @AlanKevCT </a>
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
