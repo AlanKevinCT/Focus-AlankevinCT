@@ -2,7 +2,9 @@ package mx.unam.fc.focus_alan;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.chip.Chip;
@@ -14,13 +16,12 @@ import java.util.Locale;
  */
 public class MainActivity extends AppCompatActivity {
 
-    // Creamos la vista
     private TextView tvTimerDisplay;
     private Button btnStartStop, btnReset, btnSkip;
     private ChipGroup chipGroupMode;
     private Chip chipFocus, chipBreak, chipRest;
+    private LinearLayout sessionDotsContainer;
 
-    // Lógica del Timer
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
     private long timeLeftInMillis = 1500000; // 25 minutos
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Vincular la vista con el xml
+        // Vinculamos la vista con el xml
         tvTimerDisplay = findViewById(R.id.tvTimerDisplay);
         btnStartStop = findViewById(R.id.btnStartStop);
         btnReset = findViewById(R.id.btnReset);
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         chipFocus = findViewById(R.id.chipFocus);
         chipBreak = findViewById(R.id.chipBreak);
         chipRest = findViewById(R.id.chipRest);
+        sessionDotsContainer = findViewById(R.id.sessionDotsContainer);
 
         btnStartStop.setOnClickListener(v -> {
             if (isTimerRunning) pauseTimer();
@@ -49,7 +51,18 @@ public class MainActivity extends AppCompatActivity {
         btnReset.setOnClickListener(v -> resetTimer());
         btnSkip.setOnClickListener(v -> skipSession());
 
+        chipGroupMode.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (!checkedIds.isEmpty() && !isTimerRunning) {
+                int id = checkedIds.get(0);
+                if (id == R.id.chipFocus) timeLeftInMillis = 1500000;
+                else if (id == R.id.chipBreak) timeLeftInMillis = 300000;
+                else if (id == R.id.chipRest) timeLeftInMillis = 900000;
+                updateCountDownText();
+            }
+        });
+
         updateCountDownText();
+        updateSessionDots();
     }
 
     private void startTimer() {
@@ -63,25 +76,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 isTimerRunning = false;
-                btnStartStop.setText("START");
+                btnStartStop.setText(getString(R.string.btn_start));
                 handleSessionSwitch();
             }
         }.start();
         isTimerRunning = true;
-        btnStartStop.setText("STOP");
+        btnStartStop.setText(getString(R.string.btn_stop));
     }
 
     private void pauseTimer() {
         if (countDownTimer != null) countDownTimer.cancel();
         isTimerRunning = false;
-        btnStartStop.setText("START");
+        btnStartStop.setText(getString(R.string.btn_start));
     }
 
     private void resetTimer() {
         pauseTimer();
         if (chipFocus.isChecked()) timeLeftInMillis = 1500000;
         else if (chipBreak.isChecked()) timeLeftInMillis = 300000;
-        else timeLeftInMillis = 900000;
+        else if (chipRest.isChecked()) timeLeftInMillis = 900000;
         updateCountDownText();
     }
 
@@ -111,5 +124,30 @@ public class MainActivity extends AppCompatActivity {
             timeLeftInMillis = 1500000;
         }
         updateCountDownText();
+        updateSessionDots();
+    }
+
+    private void updateSessionDots() {
+        if (sessionDotsContainer == null) return;
+        sessionDotsContainer.removeAllViews();
+
+        for (int i = 1; i <= 4; i++) {
+            View dot = new View(this);
+            int size = (int) (12 * getResources().getDisplayMetrics().density);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
+            params.setMargins(8, 0, 8, 0);
+            dot.setLayoutParams(params);
+
+            int currentRound = focusSessionsCompleted % 4;
+            if (currentRound == 0 && focusSessionsCompleted > 0) currentRound = 4;
+
+            if (i <= currentRound) {
+                dot.setBackgroundResource(R.drawable.dot_session_completed);
+            } else {
+                dot.setBackgroundResource(android.R.drawable.presence_invisible);
+                dot.setAlpha(0.3f);
+            }
+            sessionDotsContainer.addView(dot);
+        }
     }
 }
