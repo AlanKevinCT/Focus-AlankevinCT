@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="chip_text_color">#FFFFFF</color>
+    <color name="chip_background_selected">#D32F2F</color>
+    <color name="background_dark">#121212</color>
+    <color name="surface_dark">#1E1E1E</color>
+    <color name="color_primary">#FF5252</color>
+    <color name="color_secondary">#66BB6A</color>
+    <color name="color_border">#333333</color>
+    <color name="color_border_accent">#448AFF</color>
 </resources>
