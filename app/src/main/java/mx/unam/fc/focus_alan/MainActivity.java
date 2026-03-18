@@ -7,6 +7,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.widget.Toast;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import java.util.Locale;
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         btnReset.setOnClickListener(v -> resetTimer());
         btnSkip.setOnClickListener(v -> skipSession());
 
+        // Cambia el tiempo según el chip seleccionado solo si el timer está detenido
         chipGroupMode.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (!checkedIds.isEmpty() && !isTimerRunning) {
                 int id = checkedIds.get(0);
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTimer() {
+        // Limpia cualquier timer activo para evitar que corran dos al mismo tiempo
         if (countDownTimer != null) countDownTimer.cancel();
         countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
             @Override
@@ -77,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 isTimerRunning = false;
                 btnStartStop.setText(getString(R.string.btn_start));
+                notifyUser();
                 handleSessionSwitch();
             }
         }.start();
@@ -92,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetTimer() {
         pauseTimer();
+        // Reinicia el reloj al tiempo original del modo que esté marcado
         if (chipFocus.isChecked()) timeLeftInMillis = 1500000;
         else if (chipBreak.isChecked()) timeLeftInMillis = 300000;
         else if (chipRest.isChecked()) timeLeftInMillis = 900000;
@@ -106,12 +115,14 @@ public class MainActivity extends AppCompatActivity {
     private void updateCountDownText() {
         int minutes = (int) (timeLeftInMillis / 1000) / 60;
         int seconds = (int) (timeLeftInMillis / 1000) % 60;
+        // Da formato de 00:00 al texto del cronómetro
         tvTimerDisplay.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
     }
 
     private void handleSessionSwitch() {
         if (chipFocus.isChecked()) {
             focusSessionsCompleted++;
+            // Cada 4 sesiones de enfoque se activa el descanso largo (15 min)
             if (focusSessionsCompleted % 4 == 0) {
                 chipRest.setChecked(true);
                 timeLeftInMillis = 900000;
@@ -120,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 timeLeftInMillis = 300000;
             }
         } else {
+            // Si termina cualquier descanso, siempre vuelve a modo enfoque
             chipFocus.setChecked(true);
             timeLeftInMillis = 1500000;
         }
@@ -133,11 +145,13 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 1; i <= 4; i++) {
             View dot = new View(this);
+            // Convierte 12dp a píxeles según la densidad de la pantalla del celular
             int size = (int) (12 * getResources().getDisplayMetrics().density);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
             params.setMargins(8, 0, 8, 0);
             dot.setLayoutParams(params);
 
+            // Calcula el circulo actual del 1 al 4 para iluminar los puntos de manera correcta
             int currentRound = focusSessionsCompleted % 4;
             if (currentRound == 0 && focusSessionsCompleted > 0) currentRound = 4;
 
@@ -148,6 +162,20 @@ public class MainActivity extends AppCompatActivity {
                 dot.setAlpha(0.3f);
             }
             sessionDotsContainer.addView(dot);
+        }
+    }
+
+    private void notifyUser() {
+        //Lanzamos el toast de que se termino la sesion
+        Toast.makeText(this, "¡Sesión terminada!", Toast.LENGTH_SHORT).show();
+        // El telefono vibra al terminar los 25 minutos
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                v.vibrate(500);
+            }
         }
     }
 }
