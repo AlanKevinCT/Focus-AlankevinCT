@@ -122,6 +122,11 @@ public class MainActivity extends AppCompatActivity {
     private void handleSessionSwitch() {
         if (chipFocus.isChecked()) {
             focusSessionsCompleted++;
+            // Conntador de sesiones
+            TextView tvTotalSessions = findViewById(R.id.tvTotalSessions);
+            if (tvTotalSessions != null) {
+                tvTotalSessions.setText("Sesiones: " + focusSessionsCompleted);
+            }
             // Cada 4 sesiones de enfoque se activa el descanso largo (15 min)
             if (focusSessionsCompleted % 4 == 0) {
                 chipRest.setChecked(true);
