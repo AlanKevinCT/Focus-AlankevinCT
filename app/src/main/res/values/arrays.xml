@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="theme_options">
+        <item>Claro</item>
+        <item>Oscuro</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>@string/theme_light_id</item>
+        <item>@string/theme_dark_id</item>
+    </string-array>
+
+    <string-array name="lang_options">
+        <item>Español</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="lang_values">
+        <item>es</item>
+        <item>en</item>
+    </string-array>
+</resources>

@@ -1,0 +1,29 @@
+<androidx.preference.PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.PreferenceCategory
+        app:title="Ajustes">
+
+        <androidx.preference.ListPreference
+            app:key="@string/theme_preference_key"
+            app:title="Tema de la aplicación"
+            app:summary="Elige entre modo claro u oscuro"
+            app:entries="@array/theme_options"
+            app:entryValues="@array/theme_values"
+            app:defaultValue="light" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        app:title="Idioma">
+
+        <androidx.preference.ListPreference
+            app:key="@string/lang_preference_key"
+            app:title="Idioma preferido"
+            app:summary="Selecciona el lenguaje de la interfaz"
+            app:entries="@array/lang_options"
+            app:entryValues="@array/lang_values"
+            app:defaultValue="es"
+            />
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

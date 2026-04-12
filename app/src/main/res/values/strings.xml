@@ -1,14 +1,39 @@
 <resources>
-    <string name="app_name">Focus Alan</string>
-    <string name="mode_focus">FOCUS</string>
-    <string name="mode_break">BREAK</string>
-    <string name="mode_rest">LONG BREAK</string>
-    <string name="timer_default">25:00</string>
-    <string name="btn_start">START</string>
-    <string name="btn_stop">STOP</string>
-    <string name="btn_skip">SKIP</string>
-    <string name="btn_reset">RESET</string>
+    <string name="app_name" translatable="false"> FocusMony </string>
 
-    <string name="desc_stats">STATS</string>
-    <string name="desc_settings">SETTINGS</string>
+    <string name="mode_focus"> Focus </string>
+    <string name="mode_break"> Break </string>
+    <string name="mode_long_break"> Long Break </string>
+
+    <string name="timer_label_focus"> %1$s session </string>
+    <string name="timer_default_time" translatable="false"> 25:00 </string>
+
+    <string name="sessionsCount"> %1$d sessions completed </string>
+
+    <string name="btn_start"> Start </string>
+    <string name="btn_pause"> Pause </string>
+    <string name="btn_resume"> Resume </string>
+
+    <string name="quote"> "Concentration is the root of all the higher abilities in man." — Bruce Lee </string>
+
+    <string name="btn_history"> History </string>
+    <string name="btn_preferences"> Preferences </string>
+
+    <string name="title_history"> Preferences </string>
+
+    <string name="history_filter_all"> All </string>
+    <string name="history_filter_week"> This week </string>
+    <string name="history_filter_today"> Today </string>
+
+    <string name="history_empty_icon" translatable="false">🎯</string>
+    <string name="history_empty_title"> No sessions recorded </string>
+    <string name="history_empty_desc"> Start your first session! </string>
+
+    <string name="session_count"> %1$d sessions </string>
+    <string name="title_preferences">Preferences</string>
+
+    <string name="theme_preference_key" translatable="false">mx.unam.icat.esie.focusmony.THEME_PREFERENCE_KEY</string>
+    <string name="lang_preference_key" translatable="false">mx.unam.icat.esie.focusmony.LANG_PREFERENCE_KEY</string>
+    <string name="theme_light_id" translatable="false">light</string>
+    <string name="theme_dark_id" translatable="false">dark</string>
 </resources>

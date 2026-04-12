@@ -1,21 +1,25 @@
 package mx.unam.fc.focus_alan.view;
 
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
 
-import mx.unam.fc.icat.focusmony.R;
+import java.util.Locale;
+
+import mx.unam.fc.focus_alan.R;
 
 /**
  * Actividad encargada de gestionar las preferencias del usuario.
  * Implementa un Listener para reaccionar a cambios en los ajustes (como el idioma).
- * TODO: Asegurarse de agregar la dependencia de AndroidX Preference en el build.gradle.
- * @author <a href="mailto:monmm@ciencias.unam.mx" > Mónica Miranda Mijangos </a> - @monmm
- * @version 1.2, mar 2026 (esqueleto para alumnos)
+ * @author <a href="mailto:alan.kevin@ciencias.unam.mx" > Alan Kevin Cano Tenorio </a> - @AlanKevinCT
+ * @version 1.3, abril 2026
  */
 public class PreferencesActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -79,11 +83,19 @@ public class PreferencesActivity extends AppCompatActivity
     }
 
     /**
-     * TODO: Implementar este método para cambiar la configuración del idioma.
+     * Aplica el idioma de la aplicación según la preferencia del usuario.
+     * @param langCode Código del idioma (es, en, etc.)
      */
     private void applyLanguage(String langCode) {
-        // Configurar la baseContext con el nuevo Locale.
+        Locale locale = new Locale(langCode);
+        Locale.setDefault(locale);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.setLocale(locale);
+        res.updateConfiguration(conf, dm);
     }
+
 
     /**
      * Aplica el modo oscuro o claro según la preferencia del usuario.
