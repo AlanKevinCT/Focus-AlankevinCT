@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_history"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="@string/btn_history"
+        android:contentDescription=""
+        app:showAsAction="ifRoom"
+        app:tint="@color/color_secondary" />
+
+    <item
+        android:id="@+id/action_preferences"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/btn_preferences"
+        android:contentDescription=""
+        app:showAsAction="ifRoom"
+        app:tint="@color/color_secondary" />
+</menu>

@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import mx.unam.fc.icat.focusmony.R;
-import mx.unam.fc.icat.focusmony.model.Session;
-import mx.unam.fc.icat.focusmony.model.SessionManager;
+import mx.unam.fc.focus_alan.R;
+import mx.unam.fc.focus_alan.model.Session;
+import mx.unam.fc.focus_alan.model.SessionManager;
 
 /**
  * Actividad que visualiza el historial cronológico de las sesiones de enfoque y descanso.

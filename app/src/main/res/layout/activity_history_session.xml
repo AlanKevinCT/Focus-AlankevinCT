@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Historial de sesiones.
+    - Filtro de periodo (chips: Hoy / Semana / Todo)
+    - RecyclerView con el historial (item: session_history_entry.xml)
+    - Estado vacio (visible cuando no hay datos)
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootStatsLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.SessionHistoryActivity">
+
+    <!-- TOOLBAR -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/history_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:title="@string/title_history"
+        app:titleTextColor="@color/color_primary"
+        app:navigationIconTint="@color/color_primary"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- FILTRO DE PERIODO -->
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_padding_horizontal"
+        android:layout_marginTop="@dimen/spacing_lg"
+        app:chipSpacingHorizontal="@dimen/chip_spacing"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/history_toolbar"
+        app:selectionRequired="true"
+        app:singleLine="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterToday"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/btn_secondary_height"
+            android:checked="true"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingEnd="@dimen/spacing_md"
+            android:text="@string/history_filter_today" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterWeek"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/btn_secondary_height"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingEnd="@dimen/spacing_md"
+            android:text="@string/history_filter_week" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterAll"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/btn_secondary_height"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingEnd="@dimen/spacing_md"
+            android:text="@string/history_filter_all" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- Contador de resultados -->
+    <TextView
+        android:id="@+id/tvResultCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/screen_padding_horizontal"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/color_border_accent"
+        android:textSize="@dimen/quote_text_size"
+        app:layout_constraintBottom_toBottomOf="@id/chipGroupFilter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/chipGroupFilter"
+        tools:text="12 sesiones" />
+
+    <!-- Divisor decorativo -->
+    <View
+        android:id="@+id/dividerFilter"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:background="@color/color_border"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chipGroupFilter" />
+
+    <!-- ScrollView + LinearLayout -->
+    <!-- RECYCLERVIEW -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewHistory"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/spacing_xl"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dividerFilter"
+        tools:itemCount="3"
+        tools:listitem="@layout/history_session_entry" />
+
+    <!-- EMPTY STATE -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutEmpty"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dividerFilter"
+        tools:visibility="gone">
+
+        <!-- Ilustracion vacia -->
+        <TextView
+            android:id="@+id/tvEmptyIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="@string/history_empty_icon"
+            android:textSize="@dimen/timer_text_size"
+            app:layout_constraintBottom_toTopOf="@id/tvEmptyTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tvEmptyTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_xl"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:layout_marginEnd="@dimen/spacing_xl"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="@string/history_empty_title"
+            android:textColor="@color/color_primary"
+            android:textSize="@dimen/quote_text_size"
+            app:layout_constraintBottom_toTopOf="@id/tvEmptySubtitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvEmptyIcon" />
+
+        <TextView
+            android:id="@+id/tvEmptySubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_xl"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:layout_marginEnd="@dimen/spacing_xl"
+            android:layout_marginBottom="@dimen/spacing_xl"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.4"
+            android:text="@string/history_empty_desc"
+            android:textColor="@color/color_secondary"
+            android:textSize="@dimen/btn_text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvEmptyTitle" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
