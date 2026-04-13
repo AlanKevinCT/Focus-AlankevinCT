@@ -13,14 +13,14 @@ import com.google.android.material.chip.Chip;
 
 import java.util.List;
 
-import mx.unam.fc.icat.focusmony.R;
-import mx.unam.fc.icat.focusmony.model.Session;
+import mx.unam.fc.focus_alan.R;
+import mx.unam.fc.focus_alan.model.Session;
 
 /**
  * Adaptador para gestionar y reciclar las vistas del historial de sesiones.
  * Extiende de RecyclerView.Adapter parametrizado con nuestro ViewHolder específico
- * @author <a href="mailto:monmm@ciencias.unam.mx" > Mónica Miranda Mijangos </a> - @monmm
- * @version 1.2, mar 2026 (esqueleto para alumnos)
+ * @author <a href="mailto:alan.kevin@ciencias.unam.mx" > Alan Kevin Cano Tenorio </a> - @AlanKevinCT
+ * @version 1.3, abr 2026
  */
 public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAdapter.SessionViewHolder> {
 
@@ -49,7 +49,7 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
     }
 
     // Estructura de datos que contiene la información a mostrar (Dataset).
-    private final List<Session> DATASET;
+    private List<Session> DATASET;
     // Referencia a recursos para obtener colores y dimensiones dinámicamente.
     private final Resources RESOURCES;
 
@@ -115,5 +115,11 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
     @Override
     public int getItemCount() {
         return DATASET.size();
+    }
+
+    // 2. Agrega este método al final de la clase (antes de la última llave)
+    public void updateList(List<Session> newList) {
+        this.DATASET = newList;
+        notifyDataSetChanged();
     }
 }

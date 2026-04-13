@@ -29,7 +29,10 @@
     <string name="history_empty_title"> No sessions recorded </string>
     <string name="history_empty_desc"> Start your first session! </string>
 
-    <string name="session_count"> %1$d sessions </string>
+    <plurals name="session_count">
+        <item quantity="one">%1$d sesión encontrada</item>
+        <item quantity="other">%1$d sesiones encontradas</item>
+    </plurals>
     <string name="title_preferences">Preferences</string>
 
     <string name="theme_preference_key" translatable="false">mx.unam.icat.esie.focusmony.THEME_PREFERENCE_KEY</string>

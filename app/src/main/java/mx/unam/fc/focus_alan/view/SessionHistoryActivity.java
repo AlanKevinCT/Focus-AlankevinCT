@@ -10,7 +10,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import mx.unam.fc.focus_alan.R;
 import mx.unam.fc.focus_alan.model.Session;
@@ -19,8 +25,8 @@ import mx.unam.fc.focus_alan.model.SessionManager;
 /**
  * Actividad que visualiza el historial cronológico de las sesiones de enfoque y descanso.
  * Se utiliza como práctica para el manejo de RecyclerView, adaptadores y filtrado de datos.
- * @author <a href="mailto:monmm@ciencias.unam.mx" > Mónica Miranda Mijangos </a> - @monmm
- * @version 1.3, mar 2026 (esqueleto para alumnos)
+ * @author <a href="mailto:alan.kevin@ciencias.unam.mx" > Alan Kevin Cano Tenorio </a> - @AlanKevinCT
+ * @version 1.4, abr 2026
  */
 public class SessionHistoryActivity extends AppCompatActivity {
 
@@ -30,11 +36,15 @@ public class SessionHistoryActivity extends AppCompatActivity {
     private ConstraintLayout layoutEmpty;
     private RecyclerView recyclerView;
 
-    // TODO: Declarar los componentes de filtrado (ChipGroup y Chips individuales).
-
+    // Componentes de filtrado
+    private ChipGroup chipGroupFilters;
+    private Chip chipAll, chipToday, chipWeek;
     // Lógica y Datos.
     private SessionHistoryAdapter adapter;
     private SessionManager sessionManager;
+
+    // Estado del filtro actual: 0=Todos, 1=Hoy, 2=Semana
+    private int currentFilter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,16 +67,29 @@ public class SessionHistoryActivity extends AppCompatActivity {
         layoutEmpty = findViewById(R.id.layoutEmpty);
         recyclerView = findViewById(R.id.recyclerViewHistory);
 
-        // TODO: Vincular Chips mediante findViewById y asignar IDs correspondientes.
-
         sessionManager = new SessionManager(this);
+        chipGroupFilters = findViewById(R.id.chipGroupFilter);
+        chipAll = findViewById(R.id.chipFilterAll);
+        chipToday = findViewById(R.id.chipFilterToday);
+        chipWeek = findViewById(R.id.chipFilterWeek);
     }
 
     /**
      * Configuración del sistema de filtrado por temporalidad.
      */
     private void setupFilterLogic() {
-        // TODO (Opcional): Implementar el funcionamiento del ChipGroup (filtrado).
+        chipGroupFilters.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) {
+                chipAll.setChecked(true);
+                currentFilter = 0;
+            } else {
+                int checkedId = checkedIds.get(0);
+                if (checkedId == R.id.chipFilterAll) currentFilter = 0;
+                else if (checkedId == R.id.chipFilterToday) currentFilter = 1;
+                else if (checkedId == R.id.chipFilterWeek) currentFilter = 2;
+            }
+            updateHistoryDisplay();
+        });
     }
 
     /**
@@ -102,16 +125,31 @@ public class SessionHistoryActivity extends AppCompatActivity {
      * Gestiona la visibilidad de la UI y actualiza el contador.
      */
     private void updateHistoryDisplay() {
-        // TODO: Recuperar datos reales para el listado de sesiones.
+        List<Session> sessions;
+        switch (currentFilter) {
+            case 1: // Hoy
+                String today = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault()).format(new Date());
+                sessions = sessionManager.getSessionsByDate(today);
+                break;
+            case 2: // Semana
+                sessions = sessionManager.getWeeklySessions();
+                break;
+            default: // Todos
+                sessions = sessionManager.getAllSessions();
+                break;
+        }
 
-        List<Session> sessions = sessionManager.getAllSessions();
+        if (adapter != null && sessions != null) {
+            adapter.updateList(sessions);
+        }
+
         boolean isEmpty = (sessions == null || sessions.isEmpty());
-
         layoutEmpty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
         recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
 
-        // TODO: Investigar cómo usar Plurals en strings.xml para manejar "1 sesión" vs "2 sesiones".
-        String countText = getString(R.string.session_count, (sessions != null ? sessions.size() : 0));
+        // Cambia getString por getQuantityString y apunta a R.plurals
+        int count = (sessions != null ? sessions.size() : 0);
+        String countText = getResources().getQuantityString(R.plurals.session_count, count, count);
         tvResultCount.setText(countText);
     }
 
