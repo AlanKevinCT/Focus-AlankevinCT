@@ -6,24 +6,22 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
+    android:background="@color/background_dark"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbMenu"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="@dimen/spacing_xl"
-        app:title="@string/app_name"
-        app:titleTextColor="@color/color_primary"
+        app:titleTextColor="@color/white"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroupMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/chip_group_margin_top"
-        app:chipSpacingHorizontal="@dimen/chip_spacing"
+        android:layout_marginTop="16dp"
+        app:chipSpacingHorizontal="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tbMenu"
@@ -35,22 +33,25 @@
             android:id="@+id/chipFocus"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/btn_secondary_height"
+            android:layout_height="wrap_content"
             android:checked="true"
+            android:textColor="@color/white"
             android:text="@string/mode_focus" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipBreak"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/btn_secondary_height"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:text="@string/mode_break" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipRest"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/btn_secondary_height"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:text="@string/mode_long_break" />
     </com.google.android.material.chip.ChipGroup>
 
@@ -58,10 +59,9 @@
         android:id="@+id/tvSessionStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:letterSpacing="0.15"
-        android:textColor="@color/color_border_accent"
-        android:textSize="@dimen/quote_text_size"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@id/tvTimerDisplay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -71,56 +71,51 @@
         android:id="@+id/tvTimerDisplay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-condensed-medium"
-        android:includeFontPadding="false"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/timer_default_time"
-        android:textColor="@color/color_primary"
-        android:textSize="@dimen/timer_text_size"
+        android:textColor="@color/white"
+        android:textSize="100sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="25:00" />
 
+    <LinearLayout
+        android:id="@+id/sessionDotsContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTimerDisplay" />
+
     <TextView
         android:id="@+id/tvTotalSessions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_xl"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/color_secondary"
-        android:textSize="@dimen/quote_text_size"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/white"
+        android:alpha="0.7"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTimerDisplay"
+        app:layout_constraintTop_toBottomOf="@id/sessionDotsContainer"
         tools:text="Sesiones: 0" />
-
-    <ImageButton
-        android:id="@+id/btnReset"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/btn_reset"
-        android:src="@android:drawable/ic_menu_revert"
-        app:layout_constraintBottom_toBottomOf="@id/btnStartStop"
-        app:layout_constraintEnd_toStartOf="@id/btnStartStop"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnStartStop"
-        app:tint="@color/color_secondary" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStartStop"
-        android:layout_width="@dimen/btn_primary_width"
-        android:layout_height="@dimen/btn_primary_height"
-        android:layout_marginTop="@dimen/spacing_xl"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="100dp"
         android:text="@string/btn_start"
         android:textColor="@color/white"
-        android:textSize="@dimen/btn_text_size"
-        app:cornerRadius="@dimen/btn_corner_radius"
+        app:backgroundTint="@color/color_primary_variant"
+        app:cornerRadius="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTotalSessions" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/btnSkip"
@@ -131,35 +126,38 @@
         android:src="@android:drawable/ic_media_next"
         app:layout_constraintBottom_toBottomOf="@id/btnStartStop"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toEndOf="@id/btnStartStop"
         app:layout_constraintTop_toTopOf="@id/btnStartStop"
-        app:tint="@color/color_secondary" />
+        app:tint="@color/white" />
 
-    <LinearLayout
-        android:id="@+id/sessionDotsContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_lg"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
+    <ImageButton
+        android:id="@+id/btnReset"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/btn_reset"
+        android:src="@android:drawable/ic_menu_revert"
+        app:layout_constraintBottom_toBottomOf="@id/btnStartStop"
+        app:layout_constraintEnd_toStartOf="@id/btnStartStop"
+        app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnStartStop" />
+        app:layout_constraintTop_toTopOf="@id/btnStartStop"
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/tvQuote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_xl"
-        android:fontFamily="sans-serif-light"
+        android:layout_marginBottom="24dp"
         android:gravity="center"
-        android:padding="@dimen/spacing_md"
-        android:text="@string/quote"
-        android:textColor="@color/color_secondary"
-        android:textSize="@dimen/quote_text_size"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:alpha="0.6"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/quote" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
