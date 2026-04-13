@@ -1,164 +1,276 @@
 package mx.unam.fc.focus_alan;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-import android.content.Context;
-import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
+import mx.unam.fc.focus_alan.model.Session;
+import mx.unam.fc.focus_alan.model.SessionManager;
+import mx.unam.fc.focus_alan.view.PreferencesActivity;
+import mx.unam.fc.focus_alan.view.SessionHistoryActivity;
+
 /**
- * @author Alan Kevin Cano Tenorio - @AlanKevinCT
+ * Actividad principal que gestiona el ciclo de vida del temporizador Pomodoro.
+ * Coordina la interfaz de usuario, los estados de la sesión y la persistencia en SQLite.
+ * * @author Alan Kevin Cano Tenorio - @AlanKevinCT
+ * @version 1.9, abril 2026
  */
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tvTimerDisplay;
-    private Button btnStartStop, btnReset, btnSkip;
+    /** Estados posibles del temporizador para controlar el flujo de la UI. */
+    enum TimerState { IDLE, RUNNING, PAUSED }
+
+    /** Modos de sesión según la técnica Pomodoro original. */
+    enum SessionMode { FOCUS, BREAK, REST}
+
+    // Constantes de configuración de tiempo.
+    private static final long FOCUS_DURATION_MS   = 25 * 60 * 1000L;
+    private static final long BREAK_DURATION_MS   = 5 * 60 * 1000L;
+    private static final long REST_DURATION_MS    = 15 * 60 * 1000L;
+    private static final int SESSIONS_BEFORE_REST = 4;
+
+    // Componentes de la interfaz de usuario.
+    private Toolbar toolbar;
     private ChipGroup chipGroupMode;
     private Chip chipFocus, chipBreak, chipRest;
+    private TextView tvTimerDisplay, tvSessionStatus, tvSessionsCount, tvQuote;
+    private MaterialButton btnStartStop;
+    private ImageButton btnReset, btnSkip;
     private LinearLayout sessionDotsContainer;
 
+    // Elementos de lógica y persistencia.
     private CountDownTimer countDownTimer;
-    private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 1500000; // 25 minutos
+    private TimerState timerState = TimerState.IDLE;
+    private SessionMode currentMode = SessionMode.FOCUS;
+    private long timeLeftMillis = FOCUS_DURATION_MS;
     private int focusSessionsCompleted = 0;
 
+    private SessionManager sessionManager;
+    private Session currentSession;
+
+    /**
+     * Inicializa la actividad, configura el diseño inmersivo y carga los servicios básicos.
+     * @param savedInstanceState Estado de la instancia guardado (nulo en el primer inicio).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Vinculamos la vista con el xml
-        tvTimerDisplay = findViewById(R.id.tvTimerDisplay);
-        btnStartStop = findViewById(R.id.btnStartStop);
-        btnReset = findViewById(R.id.btnReset);
-        btnSkip = findViewById(R.id.btnSkip);
+        bindViews();
+        sessionManager = new SessionManager(this);
+        setSupportActionBar(toolbar);
+        setupClickListeners();
+        updateTimerDisplay(timeLeftMillis);
+        updateSessionDots();
+        displayRandomQuote();
+    }
+
+    /**
+     * Infla el menú de opciones en la Toolbar superior.
+     * @param menu Objeto menú donde se colocarán los ítems.
+     * @return true para confirmar la visualización del menú.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    /**
+     * Gestiona los eventos de clic en los ítems del menú (Historial y Configuración).
+     * @param item El ítem del menú seleccionado.
+     * @return true si el evento fue manejado correctamente.
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_history) {
+            startActivity(new Intent(this, SessionHistoryActivity.class));
+        } else if (id == R.id.action_preferences) {
+            startActivity(new Intent(this, PreferencesActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Configura el modo inmersivo cada vez que la ventana recupera el foco.
+     * Bloquea la orientación en vertical y oculta barras del sistema.
+     * @param hasFocus Indica si la ventana tiene el foco actual.
+     */
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
+    }
+
+    /**
+     * Libera recursos y cancela el temporizador para evitar fugas de memoria (memory leaks).
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelTimer();
+    }
+
+    /**
+     * Vincula los componentes gráficos del XML con las referencias en Java.
+     */
+    private void bindViews() {
+        toolbar = findViewById(R.id.tbMenu);
         chipGroupMode = findViewById(R.id.chipGroupMode);
         chipFocus = findViewById(R.id.chipFocus);
         chipBreak = findViewById(R.id.chipBreak);
         chipRest = findViewById(R.id.chipRest);
+        tvTimerDisplay = findViewById(R.id.tvTimerDisplay);
+        btnStartStop = findViewById(R.id.btnStartStop);
         sessionDotsContainer = findViewById(R.id.sessionDotsContainer);
+        tvSessionStatus = findViewById(R.id.tvSessionStatus);
+        tvSessionsCount = findViewById(R.id.tvTotalSessions);
+        tvQuote = findViewById(R.id.tvQuote);
+        btnReset = findViewById(R.id.btnReset);
+        btnSkip = findViewById(R.id.btnSkip);
+    }
 
+    /**
+     * Asigna los escuchas de eventos (listeners) a los botones y al grupo de chips.
+     */
+    private void setupClickListeners() {
         btnStartStop.setOnClickListener(v -> {
-            if (isTimerRunning) pauseTimer();
+            if (timerState == TimerState.RUNNING) pauseTimer();
             else startTimer();
         });
 
         btnReset.setOnClickListener(v -> resetTimer());
-        btnSkip.setOnClickListener(v -> skipSession());
+        btnSkip.setOnClickListener(v -> skipToNextSession());
 
-        // Cambia el tiempo según el chip seleccionado solo si el timer está detenido
         chipGroupMode.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (!checkedIds.isEmpty() && !isTimerRunning) {
+            if (!checkedIds.isEmpty() && timerState == TimerState.IDLE) {
                 int id = checkedIds.get(0);
-                if (id == R.id.chipFocus) timeLeftInMillis = 1500000;
-                else if (id == R.id.chipBreak) timeLeftInMillis = 300000;
-                else if (id == R.id.chipRest) timeLeftInMillis = 900000;
-                updateCountDownText();
+                if (id == R.id.chipFocus) currentMode = SessionMode.FOCUS;
+                else if (id == R.id.chipBreak) currentMode = SessionMode.BREAK;
+                else if (id == R.id.chipRest) currentMode = SessionMode.REST;
+                resetModeTime();
             }
         });
-
-        updateCountDownText();
-        updateSessionDots();
     }
 
+    /**
+     * Inicia el flujo del cronómetro y genera una nueva instancia de sesión para persistencia.
+     */
     private void startTimer() {
-        // Limpia cualquier timer activo para evitar que corran dos al mismo tiempo
-        if (countDownTimer != null) countDownTimer.cancel();
-        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        timerState = TimerState.RUNNING;
+        btnStartStop.setText(R.string.btn_pause);
+
+        currentSession = new Session();
+        currentSession.setType(getModeName());
+        currentSession.setDuration(currentMode == SessionMode.FOCUS ? 25 : currentMode == SessionMode.BREAK ? 5 : 15);
+        currentSession.setDate(new SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault()).format(new Date()));
+        currentSession.setStartTime(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date()));
+
+        countDownTimer = new CountDownTimer(timeLeftMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                timeLeftInMillis = millisUntilFinished;
-                updateCountDownText();
+                timeLeftMillis = millisUntilFinished;
+                updateTimerDisplay(millisUntilFinished);
             }
+
             @Override
             public void onFinish() {
-                isTimerRunning = false;
-                btnStartStop.setText(getString(R.string.btn_start));
-                notifyUser();
-                handleSessionSwitch();
+                onSessionFinished();
             }
         }.start();
-        isTimerRunning = true;
-        btnStartStop.setText(getString(R.string.btn_stop));
     }
 
+    /**
+     * Detiene el temporizador y actualiza el estado de la UI a pausa.
+     */
     private void pauseTimer() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (countDownTimer != null) countDownTimer.cancel();
-        isTimerRunning = false;
-        btnStartStop.setText(getString(R.string.btn_start));
+        timerState = TimerState.PAUSED;
+        btnStartStop.setText(R.string.btn_resume);
     }
 
-    private void resetTimer() {
-        pauseTimer();
-        // Reinicia el reloj al tiempo original del modo que esté marcado
-        if (chipFocus.isChecked()) timeLeftInMillis = 1500000;
-        else if (chipBreak.isChecked()) timeLeftInMillis = 300000;
-        else if (chipRest.isChecked()) timeLeftInMillis = 900000;
-        updateCountDownText();
-    }
+    /**
+     * Ejecuta la lógica de finalización de sesión, guarda en la base de datos
+     * y gestiona la transición al siguiente modo Pomodoro.
+     */
+    private void onSessionFinished() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        timerState = TimerState.IDLE;
 
-    private void skipSession() {
-        pauseTimer();
-        handleSessionSwitch();
-    }
-
-    private void updateCountDownText() {
-        int minutes = (int) (timeLeftInMillis / 1000) / 60;
-        int seconds = (int) (timeLeftInMillis / 1000) % 60;
-        // Da formato de 00:00 al texto del cronómetro
-        tvTimerDisplay.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
-    }
-
-    private void handleSessionSwitch() {
-        if (chipFocus.isChecked()) {
+        if (currentMode == SessionMode.FOCUS) {
             focusSessionsCompleted++;
-            // Conntador de sesiones
-            TextView tvTotalSessions = findViewById(R.id.tvTotalSessions);
-            if (tvTotalSessions != null) {
-                tvTotalSessions.setText("Sesiones: " + focusSessionsCompleted);
-            }
-            // Cada 4 sesiones de enfoque se activa el descanso largo (15 min)
-            if (focusSessionsCompleted % 4 == 0) {
-                chipRest.setChecked(true);
-                timeLeftInMillis = 900000;
-            } else {
-                chipBreak.setChecked(true);
-                timeLeftInMillis = 300000;
-            }
+            currentMode = (focusSessionsCompleted >= SESSIONS_BEFORE_REST) ? SessionMode.REST : SessionMode.BREAK;
+            if (focusSessionsCompleted >= SESSIONS_BEFORE_REST) focusSessionsCompleted = 0;
         } else {
-            // Si termina cualquier descanso, siempre vuelve a modo enfoque
-            chipFocus.setChecked(true);
-            timeLeftInMillis = 1500000;
+            currentMode = SessionMode.FOCUS;
         }
-        updateCountDownText();
+
+        currentSession.setCompleted(true);
+        sessionManager.saveSession(currentSession);
+
+        Toast.makeText(this, "Sesión guardada", Toast.LENGTH_SHORT).show();
+        vibrate();
+
+        resetModeTime();
+        btnStartStop.setText(R.string.btn_start);
         updateSessionDots();
     }
 
+    /**
+     * Actualiza el contenedor de indicadores visuales (puntos) según el progreso de la ronda.
+     */
     private void updateSessionDots() {
         if (sessionDotsContainer == null) return;
         sessionDotsContainer.removeAllViews();
+        int currentRound = (focusSessionsCompleted == 0) ? 0 : focusSessionsCompleted;
 
         for (int i = 1; i <= 4; i++) {
             View dot = new View(this);
-            // Convierte 12dp a píxeles según la densidad de la pantalla del celular
-            int size = (int) (12 * getResources().getDisplayMetrics().density);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
+            int dotSize = (int) (12 * getResources().getDisplayMetrics().density);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dotSize, dotSize);
             params.setMargins(8, 0, 8, 0);
             dot.setLayoutParams(params);
-
-            // Calcula el circulo actual del 1 al 4 para iluminar los puntos de manera correcta
-            int currentRound = focusSessionsCompleted % 4;
-            if (currentRound == 0 && focusSessionsCompleted > 0) currentRound = 4;
 
             if (i <= currentRound) {
                 dot.setBackgroundResource(R.drawable.dot_session_completed);
@@ -168,19 +280,137 @@ public class MainActivity extends AppCompatActivity {
             }
             sessionDotsContainer.addView(dot);
         }
+        if (tvSessionsCount != null) {
+            tvSessionsCount.setText(getString(R.string.sessionsCount, focusSessionsCompleted));
+        }
     }
 
-    private void notifyUser() {
-        //Lanzamos el toast de que se termino la sesion
-        Toast.makeText(this, "¡Sesión terminada!", Toast.LENGTH_SHORT).show();
-        // El telefono vibra al terminar los 25 minutos
+    /**
+     * Reasigna el tiempo base según el modo seleccionado (Focus, Break o Rest).
+     */
+    private void resetModeTime() {
+        switch (currentMode) {
+            case FOCUS: timeLeftMillis = FOCUS_DURATION_MS; break;
+            case BREAK: timeLeftMillis = BREAK_DURATION_MS; break;
+            case REST:  timeLeftMillis = REST_DURATION_MS; break;
+        }
+        updateTimerDisplay(timeLeftMillis);
+    }
+
+    /**
+     * Cancela físicamente la ejecución del CountDownTimer.
+     */
+    private void cancelTimer() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
+    }
+
+    /**
+     * Reinicia el cronómetro al tiempo inicial del modo actual de forma manual.
+     */
+    private void resetTimer() {
+        cancelTimer();
+        timerState = TimerState.IDLE;
+        resetModeTime();
+        btnStartStop.setText(R.string.btn_start);
+    }
+
+    /**
+     * Salta la sesión actual. Si está corriendo, se guarda como interrumpida en el historial.
+     */
+    private void skipToNextSession() {
+        if (timerState == TimerState.RUNNING) {
+            currentSession.setCompleted(false);
+            sessionManager.saveSession(currentSession);
+            cancelTimer();
+        }
+        handleSkipLogic();
+    }
+
+    /**
+     * Lógica de transición de estados cuando el usuario decide saltar una sesión.
+     */
+    private void handleSkipLogic() {
+        if (currentMode == SessionMode.FOCUS) {
+            focusSessionsCompleted++;
+            currentMode = (focusSessionsCompleted % 4 == 0) ? SessionMode.REST : SessionMode.BREAK;
+        } else {
+            currentMode = SessionMode.FOCUS;
+        }
+        timerState = TimerState.IDLE;
+        resetModeTime();
+        btnStartStop.setText(R.string.btn_start);
+        updateSessionDots();
+    }
+
+    /**
+     * Actualiza el cronómetro visual y la etiqueta de estado en la pantalla.
+     * @param millis Tiempo restante en milisegundos.
+     */
+    private void updateTimerDisplay(long millis) {
+        selectChipForMode(currentMode);
+        int minutes = (int) (millis / 1000) / 60;
+        int seconds = (int) (millis / 1000) % 60;
+        tvTimerDisplay.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
+        if (tvSessionStatus != null) tvSessionStatus.setText(getModeName());
+    }
+
+    /**
+     * Selecciona y resalta el Chip correspondiente al modo de sesión activo.
+     * @param mode Modo de sesión actual.
+     */
+    private void selectChipForMode(SessionMode mode) {
+        int chipId = (mode == SessionMode.BREAK) ? R.id.chipBreak :
+                (mode == SessionMode.REST) ? R.id.chipRest : R.id.chipFocus;
+        chipGroupMode.check(chipId);
+        highlightChip(findViewById(chipId));
+    }
+
+    /**
+     * Aplica un borde de resaltado al Chip activo y lo quita de los demás.
+     * @param activeChip El componente Chip que debe ser resaltado.
+     */
+    private void highlightChip(Chip activeChip) {
+        if (activeChip == null) return;
+        float density = getResources().getDisplayMetrics().density;
+        Chip[] allChips = {chipFocus, chipBreak, chipRest};
+        for (Chip chip : allChips) chip.setChipStrokeWidth(0);
+
+        activeChip.setChipStrokeWidth(2 * density);
+        activeChip.setChipStrokeColor(ColorStateList.valueOf(
+                ContextCompat.getColor(this, R.color.color_border_accent)));
+    }
+
+    /**
+     * Activa una vibración corta para notificar al usuario el fin de la sesión.
+     */
+    private void vibrate() {
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (v != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
                 v.vibrate(500);
             }
+        }
+    }
+
+    /**
+     * Obtiene el nombre legible del modo de sesión actual.
+     * @return Cadena de texto con el nombre del modo.
+     */
+    private String getModeName() {
+        return (currentMode == SessionMode.FOCUS) ? getString(R.string.mode_focus) :
+                (currentMode == SessionMode.BREAK) ? getString(R.string.mode_break) : getString(R.string.mode_long_break);
+    }
+
+    private void displayRandomQuote() {
+        if (tvQuote != null) {
+            // Usamos la frase que definiste en strings.xml
+            tvQuote.setText(R.string.quote);
         }
     }
 }
