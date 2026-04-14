@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         sessionManager.saveSession(currentSession);
 
         Toast.makeText(this, "Sesión guardada", Toast.LENGTH_SHORT).show();
-        vibrate();
+        notifyUser();
 
         resetModeTime();
         btnStartStop.setText(R.string.btn_start);
@@ -385,9 +385,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Activa una vibración corta para notificar al usuario el fin de la sesión.
+     * Activa una vibración corta y muestra un mensaje para notificar al usuario el fin de la sesión.
      */
-    private void vibrate() {
+    private void notifyUser() {
+        Toast.makeText(this, "¡Sesión terminada!", Toast.LENGTH_SHORT).show();
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (v != null) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

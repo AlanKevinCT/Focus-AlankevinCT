@@ -2,19 +2,18 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/action_history"
         android:icon="@android:drawable/ic_menu_recent_history"
         android:title="@string/btn_history"
-        android:contentDescription=""
-        app:showAsAction="ifRoom"
-        app:tint="@color/color_secondary" />
+        android:contentDescription="Historial de sesiones"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_preferences"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/btn_preferences"
-        android:contentDescription=""
-        app:showAsAction="ifRoom"
-        app:tint="@color/color_secondary" />
+        android:contentDescription="Configuración"
+        app:showAsAction="ifRoom" />
 </menu>
