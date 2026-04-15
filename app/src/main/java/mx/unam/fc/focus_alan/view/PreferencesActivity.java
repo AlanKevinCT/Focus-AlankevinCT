@@ -28,6 +28,14 @@ public class PreferencesActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String theme = prefs.getString(getString(R.string.theme_preference_key), "system");
+        applyTheme(theme);
+
+        String lang = prefs.getString(getString(R.string.lang_preference_key), "es");
+        applyLanguage(lang);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferences);
 
@@ -56,15 +64,12 @@ public class PreferencesActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        // Registramos el listener (ESTO ES LO QUE FALTA)
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String lang = prefs.getString(getString(R.string.lang_preference_key), "es");
+        String theme = prefs.getString(getString(R.string.theme_preference_key), "system");
 
-        // Aplicamos el estado actual (esto ya lo tienes)
-        String lang = sharedPreferences.getString(getString(R.string.lang_preference_key), "en");
         applyLanguage(lang);
-
-        String themeValue = sharedPreferences.getString(getString(R.string.theme_preference_key), "system");
-        applyTheme(themeValue);
+        applyTheme(theme);
     }
 
     @Override
@@ -79,17 +84,16 @@ public class PreferencesActivity extends AppCompatActivity
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        // Caso Idioma
         if (getString(R.string.lang_preference_key).equals(key)) {
             String lang = sharedPreferences.getString(key, "es");
             applyLanguage(lang);
             recreate();
         }
 
-        // Caso Tema (Oscuro / Claro / Sistema)
-        if (key.equals(getString(R.string.theme_preference_key))) {
+        if (getString(R.string.theme_preference_key).equals(key)) {
             String themeValue = sharedPreferences.getString(key, "system");
             applyTheme(themeValue);
+            recreate();
         }
     }
 
