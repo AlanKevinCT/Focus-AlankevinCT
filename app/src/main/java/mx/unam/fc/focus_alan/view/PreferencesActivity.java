@@ -49,11 +49,22 @@ public class PreferencesActivity extends AppCompatActivity
                 .commit();
     }
 
+    /**
+     * Se ejecuta cuando el usuario regresa a esta pantalla.
+     * Aquí verificamos si cambió el tema o el idioma en PreferencesActivity.
+     */
     @Override
     protected void onResume() {
         super.onResume();
-        // Registramos el listener para detectar cambios mientras la actividad es visible
+        // Registramos el listener (ESTO ES LO QUE FALTA)
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        // Aplicamos el estado actual (esto ya lo tienes)
+        String lang = sharedPreferences.getString(getString(R.string.lang_preference_key), "en");
+        applyLanguage(lang);
+
+        String themeValue = sharedPreferences.getString(getString(R.string.theme_preference_key), "system");
+        applyTheme(themeValue);
     }
 
     @Override
@@ -69,7 +80,7 @@ public class PreferencesActivity extends AppCompatActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         // Caso Idioma
-        if (key.equals(getString(R.string.lang_preference_key))) {
+        if (getString(R.string.lang_preference_key).equals(key)) {
             String lang = sharedPreferences.getString(key, "es");
             applyLanguage(lang);
             recreate();
