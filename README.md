@@ -1,29 +1,31 @@
-# Focus Alan - Pomodoro Timer 
+# Focus Alan - Alan Kevin Cano Tenorio
 
-## Descripción de la Práctica
-La práctica se enfocó en el desarrollo de una herramienta funcional que se basa en la técnica de Pomodoro.
-
-### 📋 Actividades Realizadas
-1. **Corrección de Estructura**: Se reestructuró todo el proyecto, ya que al crearlo por primera vez, faltaban muchas dependencias como GRADLE.
-2. **Motor del Temporizador**: Se implementó la técnica de Pomodoro con cambio automático entre Enfoque (25 min), Descanso Corto (5 min) y Descanso Largo (15 min).
-3. **Interfaz Dinámica**: Creación de un sistema de puntos de progreso mediante un `LinearLayout` que genera `Views` dinámicamente para reflejar las sesiones completadas.
-4. **Feedback de Usuario**: Se configuró el `Manifest` de android para habilitar la vibración y el uso de `Toasts` informativos al finalizar cada bloque.
-5. **Diseño Material**: Se usó `ChipGroup` para la selección de modos y personalización de estilos (bordes de 2dp y dimensiones en `dimens.xml`).
+**Nombre:** Alan Kevin Cano Tenorio  
+**No. de Cuenta:** *321259967*
 
 ---
 
-## Preguntas sobre la Implementación
+## 1. Descripción General de Tareas Realizadas
+El proyecto consistió en el desarrollo de una aplicación de productividad basada en la técnica Pomodoro, siguiendo la arquitectura **MVC** (Modelo-Vista-Controlador). Las tareas principales:
 
-### ¿Cuál fue el mayor reto al gestionar el CountDownTimer y cómo evitaste que se crearan múltiples instancias al presionar el botón repetidamente?
-El mayor reto fue entender cómo debían actualizarse los puntos verdes con el final de cada pomodoro, ya que no sabía si el progreso se marcaba antes o después de los 5 minutos de descanso. Al final, lo lógico fue que se pintaran justo al terminar los 25 minutos de enfoque.
+* **Arquitectura y Modularización:** Organización del código en paquetes específicos (`.view`, `.model`, `.data`) para garantizar un código escalable y ordenado.
+* **Temporizador Pomodoro:** Implementación de estados: **Enfoque** (25 min), **Descanso Corto** (5 min) y **Descanso Largo** (15 min).
+* **Persistencia de Sesiones:** Uso de **SQLite nativo** para el registro de sesiones, asegurando  la persistencia e inmutabilidad
+* **Sistema de Preferencias:** Implementación de un sistema bilingüe (Español/Inglés) y soporte para Temas (Claro/Oscuro).
+* **Interfaz Dinámica:** Creación de indicadores de progreso dinámicos para reflejar las sesiones completadas de la ronda actual.
+* **Integración de Hardware:** Emitir feedback mediante la vibración del dispositivo al finalizar el cronómetro.
+---
 
-Para evitar la creación de varias instancias al presionar el botón de inicio muchas veces, utilicé una validación donde, antes de crear un nuevo timer, se ejecuta un countDownTimer.cancel().
+## 2. Comentarios Adicionales y Desafíos
+Lo que más trabajo me costó fue lograr que las preferencias de usuario se aplicaran de manera persistente y, sobre todo, **instantánea**. Al cambiar el idioma o el tema en la `PreferencesActivity`, era necesario que los cambios se vieran reflejados en la `MainActivity` inmediatamente al regresar, por lo que opté por usar el método recreate() para actualizar la pantalla, sin embargo, en algunas ocasiones era de manera momentanea y otras se tardaba 1 minuto en hacerlo.
+Asímismo, el evitar usar código hardcodeado, ya que, es la primera vez que utilizo strings.xml y dimens.xml con buenas convenciones, por lo que tuve que volver a revisar todo el código para eliminar los hardcoded.
 
-### ¿Por qué es preferible usar un LinearLayout con addView para los puntos de progreso en lugar de declarar 4 ImageViews estáticos en el XML?
-Es preferible porque nos da mucha más libertad en el código. Si lo hacemos estático en el XML, estamos amarrados a solo 4 puntos, pero con addView en un bucle for, el programa puede generar la cantidad de puntos que queramos de forma dinámica. Además, es más limpio manejar el dibujo de los círculos desde Java que andar buscando 4 IDs diferentes en el layout.
+---
 
-### Si quisiéramos añadir una función para que el usuario personalice sus propios tiempos de enfoque, ¿qué parte de tu lógica actual tendría que cambiar y cómo lo abordarías?
-Se tendría que agregar una función que permita cambiarlos, pero específicamente habría que quitar los valores hardcodeados (como los 1,500,000 ms que tenemos ahorita). Lo abordaría creando variables globales para los tiempos y conectándolas a un menú de configuración o cajones de texto (EditText) para que el usuario ponga sus propios minutos, y que esos valores se guarden para que no se borren al cerrar la app.
+## 3. Futura Versión (v2.0)
+Si tuviera que producir una segunda versión, realizaría los siguientes cambios:
 
-### ¿Cómo harían para que el tiempo del temporizador se mantenga si el usuario minimiza la app?
-A lo mejor debemos modificar el manifiesto de Android para darle permisos de ejecución en segundo plano. La forma correcta sería usar algo llamado "Foreground Service" (Servicio de primer plano). Esto hace que el temporizador siga viviendo aunque la pantalla esté minimizada, mostrando el tiempo en una notificación para que el sistema de Android no cierre la aplicación por falta de memoria.
+* **Simplificación de la Lógica:** Eliminaría la opción de "saltar sesiones" (Skip) y los indicadores de puntos de sesión para crear una experiencia más estricta, eliminando distracciones para el usuario.
+* **Ejecución en Segundo Plano:** Habilitaria la opción de ejecutar en segundo plano para que el usuario pueda salirse de la aplicación para realizar sus tareas desde su celular u otras  actividades que deba realizar.
+
+---
