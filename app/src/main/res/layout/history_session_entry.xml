@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Ítem del RecyclerView del historial.
-  Cada fila representa una sesión registrada.
--->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,35 +8,34 @@
     android:layout_marginStart="@dimen/screen_padding_horizontal"
     android:layout_marginTop="@dimen/spacing_sm"
     android:layout_marginEnd="@dimen/screen_padding_horizontal"
+    app:cardBackgroundColor="@color/surface_dark"
     app:cardCornerRadius="@dimen/spacing_lg"
     app:cardElevation="0dp"
-    app:rippleColor="@color/color_border">
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/color_border"
+    app:rippleColor="@color/color_primary_variant">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/spacing_md">
 
-        <!-- Nombre del tipo de sesión -->
         <TextView
             android:id="@+id/tvSessionType"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_md"
             android:fontFamily="sans-serif-medium"
-            android:textColor="@color/color_primary"
+            android:textColor="@color/white"
             android:textSize="@dimen/btn_text_size"
             app:layout_constraintEnd_toStartOf="@id/tvSessionTime"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Sesión de Enfoque" />
 
-        <!-- Fecha de la sesión -->
         <TextView
             android:id="@+id/tvSessionDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_md"
             android:layout_marginTop="@dimen/spacing_xs"
             android:fontFamily="sans-serif"
             android:textColor="@color/color_secondary"
@@ -48,9 +43,8 @@
             app:layout_constraintEnd_toStartOf="@id/tvSessionDuration"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSessionType"
-            tools:text="Lun, 8 mar 2026" />
+            tools:text="Lun, 14 abr 2026" />
 
-        <!-- Hora de inicio -->
         <TextView
             android:id="@+id/tvSessionTime"
             android:layout_width="wrap_content"
@@ -60,22 +54,19 @@
             android:textSize="@dimen/btn_text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tvSessionType"
-            tools:text="09:30" />
+            tools:text="18:40" />
 
-        <!-- Duración -->
         <TextView
             android:id="@+id/tvSessionDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xs"
-            android:fontFamily="sans-serif"
-            android:textColor="@color/color_border_accent"
+            android:fontFamily="sans-serif-medium"            android:textColor="@color/white"
             android:textSize="@dimen/quote_text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSessionTime"
             tools:text="25 min" />
 
-        <!-- Chip de estado: Completada / Interrumpida -->
         <com.google.android.material.chip.Chip
             android:id="@+id/chipSessionStatus"
             android:layout_width="wrap_content"
@@ -83,18 +74,16 @@
             android:layout_marginTop="@dimen/spacing_sm"
             android:checkable="false"
             android:clickable="false"
-            android:focusable="false"
             android:fontFamily="sans-serif-medium"
             android:textSize="@dimen/caption_text_size"
+            android:textColor="@color/white"
+            app:chipBackgroundColor="@color/color_primary_variant"
             app:chipCornerRadius="100dp"
             app:chipMinHeight="24dp"
             app:chipStrokeWidth="0dp"
-            app:layout_constraintStart_toStartOf="@id/tvSessionType"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSessionDate"
-            tools:chipBackgroundColor="@color/color_primary_alpha20"
-            tools:text="✓  Completada"
-            tools:textColor="@color/color_primary" />
+            tools:text="✓  Completada" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </com.google.android.material.card.MaterialCardView>
