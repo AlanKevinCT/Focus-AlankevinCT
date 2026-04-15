@@ -20,7 +20,7 @@ import java.util.Locale;
 
 import mx.unam.fc.focus_alan.R;
 import mx.unam.fc.focus_alan.model.Session;
-import mx.unam.fc.focus_alan.model.SessionManager;
+import mx.unam.fc.focus_alan.data.SessionManager;
 
 /**
  * Actividad que visualiza el historial cronológico de las sesiones de enfoque y descanso.

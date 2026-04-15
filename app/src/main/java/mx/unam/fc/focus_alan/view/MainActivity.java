@@ -1,4 +1,4 @@
-package mx.unam.fc.focus_alan;
+package mx.unam.fc.focus_alan.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,10 +32,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import mx.unam.fc.focus_alan.R;
 import mx.unam.fc.focus_alan.model.Session;
-import mx.unam.fc.focus_alan.model.SessionManager;
-import mx.unam.fc.focus_alan.view.PreferencesActivity;
-import mx.unam.fc.focus_alan.view.SessionHistoryActivity;
+import mx.unam.fc.focus_alan.data.SessionManager;
 
 /**
  * Actividad principal que gestiona el ciclo de vida del temporizador Pomodoro.
@@ -245,16 +245,28 @@ public class MainActivity extends AppCompatActivity {
         } else {
             currentMode = SessionMode.FOCUS;
         }
-
         currentSession.setCompleted(true);
-        sessionManager.saveSession(currentSession);
+        new Thread(() -> {
+            try {
+                sessionManager.saveSession(currentSession);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, R.string.session_saved, Toast.LENGTH_SHORT).show();
+                    updateSessionDots();
+                });
 
-        Toast.makeText(this, "Sesión guardada", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.e("FocusAlan", "Error al persistir la sesión", e);
+                runOnUiThread(() ->
+                        Toast.makeText(this, R.string.error_db_save, Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
+        runOnUiThread(() -> {
+            updateSessionDots();
+        });
         notifyUser();
-
         resetModeTime();
         btnStartStop.setText(R.string.btn_start);
-        updateSessionDots();
     }
 
     /**
@@ -388,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
      * Activa una vibración corta y muestra un mensaje para notificar al usuario el fin de la sesión.
      */
     private void notifyUser() {
-        Toast.makeText(this, "¡Sesión terminada!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.toast_session_finished), Toast.LENGTH_SHORT).show();
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (v != null) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

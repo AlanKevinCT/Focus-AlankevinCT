@@ -18,7 +18,7 @@ import mx.unam.fc.focus_alan.model.Session;
 
 /**
  * Adaptador para gestionar y reciclar las vistas del historial de sesiones.
- * Extiende de RecyclerView.Adapter parametrizado con nuestro ViewHolder específico
+ * Extiende de RecyclerView. Adapter parametrizado con nuestro ViewHolder específico
  * @author <a href="mailto:alan.kevin@ciencias.unam.mx" > Alan Kevin Cano Tenorio </a> - @AlanKevinCT
  * @version 1.3, abr 2026
  */
@@ -28,10 +28,10 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
      * Clase interna que describe y mantiene las referencias a los widgets de cada ítem.
      * Actúa como un contenedor que evita llamadas repetitivas a findViewById.
      */
-    class SessionViewHolder extends RecyclerView.ViewHolder {
+     static class SessionViewHolder extends RecyclerView.ViewHolder {
         // Referencias a los elementos gráficos definidos en history_session_entry.xml.
-        private TextView tvSessionType, tvSessionDate, tvSessionTime, tvSessionDuration;
-        private Chip chipStatus;
+        private final TextView tvSessionType, tvSessionDate, tvSessionTime, tvSessionDuration;
+        private final Chip chipStatus;
 
         /**
          * Constructor que recibe la vista inflada del ítem.
@@ -92,18 +92,18 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
         holder.tvSessionDate.setText(session.getDate());
         holder.tvSessionTime.setText(session.getStartTime());
         // Concatenamos la unidad de tiempo (min) al valor numérico.
-        holder.tvSessionDuration.setText(session.getDuration() + " min");
+        int minutes = session.getDuration();
+        String durationText = holder.itemView.getContext().getString(R.string.session_duration_format, minutes);
+        holder.tvSessionDuration.setText(durationText);
 
         // Lógica de retroalimentación visual basada en el estado de la sesión.
         if (session.isCompleted()) {
             // Caso: Sesión terminada exitosamente.
-            holder.chipStatus.setText("✓ Completada");
-            holder.chipStatus.setChipBackgroundColorResource(R.color.white);
+            holder.chipStatus.setText(holder.itemView.getContext().getString(R.string.status_completed));            holder.chipStatus.setChipBackgroundColorResource(R.color.white);
             holder.chipStatus.setTextColor(RESOURCES.getColor(R.color.color_primary, null));
         } else {
             // Caso: Sesión interrumpida por el usuario o sistema.
-            holder.chipStatus.setText("✕ Interrumpida");
-            holder.chipStatus.setChipBackgroundColorResource(R.color.color_secondary);
+            holder.chipStatus.setText(holder.itemView.getContext().getString(R.string.status_interrupted));            holder.chipStatus.setChipBackgroundColorResource(R.color.color_secondary);
             holder.chipStatus.setTextColor(RESOURCES.getColor(R.color.white, null));
         }
     }

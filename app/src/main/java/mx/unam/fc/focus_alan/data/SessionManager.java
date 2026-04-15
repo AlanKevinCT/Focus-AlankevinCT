@@ -1,4 +1,4 @@
-package mx.unam.fc.focus_alan.model;
+package mx.unam.fc.focus_alan.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
+
+import mx.unam.fc.focus_alan.model.Session;
 
 /**
  * Clase que maneja el ciclo de vida de las tareas sugeridas dentro de la aplicación.

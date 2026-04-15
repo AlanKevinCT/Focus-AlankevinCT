@@ -1,14 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Focus Alan</string>
-    <string name="mode_focus">FOCUS</string>
-    <string name="mode_break">BREAK</string>
-    <string name="mode_rest">LONG BREAK</string>
-    <string name="timer_default">25:00</string>
-    <string name="btn_start">START</string>
-    <string name="btn_stop">STOP</string>
-    <string name="btn_skip">SKIP</string>
-    <string name="btn_reset">RESET</string>
+    <string name="app_name" translatable="false">Focus Alan</string>
 
-    <string name="desc_stats">STATS</string>
-    <string name="desc_settings">SETTINGS</string>
+    <string name="mode_focus">Enfoque</string>
+    <string name="mode_break">Descanso Corto</string>
+    <string name="mode_long_break">Descanso Largo</string>
+    <string name="mode_rest">Descanso</string>
+    <string name="timer_label_focus">Sesión de %1$s</string>
+
+    <string name="sessionsCount">%1$d sesiones completadas</string>
+
+    <string name="btn_start">Empezar</string>
+    <string name="btn_pause">Pausa</string>
+    <string name="btn_resume">Reanudar</string>
+    <string name="btn_reset">Reiniciar</string>
+    <string name="btn_skip">Saltar</string>
+    <string name="btn_stop">Detener</string>
+
+    <string name="quote">"La concentración es la raíz de todas las habilidades superiores en el hombre." — Bruce Lee</string>
+
+    <string name="btn_history">Historial</string>
+    <string name="btn_preferences">Ajustes</string>
+    <string name="title_history">Historial</string>
+    <string name="title_preferences">Ajustes</string>
+
+    <string name="history_filter_all">Todos</string>
+    <string name="history_filter_week">Esta semana</string>
+    <string name="history_filter_today">Hoy</string>
+
+    <string name="history_empty_title">No hay sesiones registradas</string>
+    <string name="history_empty_desc">¡Comienza tu primera sesión!</string>
+
+    <string name="session_saved">¡Sesión guardada con éxito!</string>
+    <string name="error_db_save">Error al guardar: la base de datos no respondió</string>
+    <string name="toast_session_finished">¡Sesión terminada!</string>
+    <string name="status_interrupted">✕ Interrumpida</string>
+    <string name="status_completed">✓ Completada</string>
+    <string name="session_duration_format">%1$d min</string>
+
+    <string name="desc_stats">Ver estadísticas</string>
+    <string name="desc_settings">Ir a ajustes</string>
+    <plurals name="session_count">
+        <item quantity="one">%1$d sesión encontrada</item>
+        <item quantity="many">%1$d sesiones encontradas</item> <item quantity="other">%1$d sesiones encontradas</item>
+    </plurals>
 </resources>

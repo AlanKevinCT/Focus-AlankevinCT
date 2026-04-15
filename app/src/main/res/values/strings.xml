@@ -1,21 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Focus Alan</string>
 
     <string name="mode_focus">Focus</string>
-    <string name="mode_break">Break</string>
+    <string name="mode_break">Short Break</string>
     <string name="mode_long_break">Long Break</string>
-    <string name="mode_rest">Rest</string> <string name="timer_label_focus">%1$s session</string>
+    <string name="mode_rest">Rest</string>
+    <string name="timer_label_focus">%1$s Session</string>
     <string name="timer_default_time" translatable="false">25:00</string>
-    <string name="timer_default" translatable="false">25:00</string> <string name="sessionsCount">%1$d sessions completed</string>
+    <string name="timer_default" translatable="false">25:00</string>
+
+    <string name="sessionsCount">%1$d sessions completed</string>
 
     <string name="btn_start">Start</string>
     <string name="btn_pause">Pause</string>
     <string name="btn_resume">Resume</string>
-    <string name="btn_reset">Reset</string> <string name="btn_skip">Skip</string>   <string name="btn_stop">Stop</string>   <string name="quote">"Concentration is the root of all the higher abilities in man." — Bruce Lee</string>
+    <string name="btn_reset">Reset</string>
+    <string name="btn_skip">Skip</string>
+    <string name="btn_stop">Stop</string>
+
+    <string name="quote">"Concentration is the root of all the higher abilities in man." — Bruce Lee</string>
 
     <string name="btn_history">History</string>
-    <string name="btn_preferences">Preferences</string>
+    <string name="btn_preferences">Settings</string>
     <string name="title_history">History</string>
+    <string name="title_preferences">Settings</string>
+
     <string name="history_filter_all">All</string>
     <string name="history_filter_week">This week</string>
     <string name="history_filter_today">Today</string>
@@ -24,15 +34,22 @@
     <string name="history_empty_title">No sessions recorded</string>
     <string name="history_empty_desc">Start your first session!</string>
 
-    <plurals name="session_count">
-        <item quantity="one">%1$d sesión encontrada</item>
-        <item quantity="other">%1$d sesiones encontradas</item>
-    </plurals>
-
-    <string name="title_preferences">Preferences</string>
-
     <string name="theme_preference_key" translatable="false">theme_pref</string>
     <string name="lang_preference_key" translatable="false">lang_pref</string>
     <string name="theme_light_id" translatable="false">light</string>
     <string name="theme_dark_id" translatable="false">dark</string>
+
+    <string name="session_saved">Session saved successfully!</string>
+    <string name="error_db_save">Save error: Database not responding</string>
+    <string name="toast_session_finished">Session finished!</string>
+    <string name="status_interrupted">✕ Interrupted</string>
+    <string name="status_completed">✓ Completed</string>
+    <string name="session_duration_format">%1$d min</string>
+
+    <string name="desc_stats">View statistics</string>
+    <string name="desc_settings">Go to settings</string>
+    <plurals name="session_count">
+        <item quantity="one">%1$d session found</item>
+        <item quantity="other">%1$d sessions found</item>
+    </plurals>
 </resources>
