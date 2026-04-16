@@ -30,12 +30,13 @@ public class PreferencesActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+        // Aplicar Tema
         String theme = prefs.getString(getString(R.string.theme_preference_key), "system");
         applyTheme(theme);
 
+        // Aplicar Idioma
         String lang = prefs.getString(getString(R.string.lang_preference_key), "es");
         applyLanguage(lang);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferences);
 
@@ -57,19 +58,11 @@ public class PreferencesActivity extends AppCompatActivity
                 .commit();
     }
 
-    /**
-     * Se ejecuta cuando el usuario regresa a esta pantalla.
-     * Aquí verificamos si cambió el tema o el idioma en PreferencesActivity.
-     */
     @Override
     protected void onResume() {
         super.onResume();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String lang = prefs.getString(getString(R.string.lang_preference_key), "es");
-        String theme = prefs.getString(getString(R.string.theme_preference_key), "system");
-
-        applyLanguage(lang);
-        applyTheme(theme);
+        // Registramos el listener para detectar cambios mientras la actividad es visible
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -84,13 +77,15 @@ public class PreferencesActivity extends AppCompatActivity
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (getString(R.string.lang_preference_key).equals(key)) {
+        // Caso Idioma
+        if (key.equals(getString(R.string.lang_preference_key))) {
             String lang = sharedPreferences.getString(key, "es");
             applyLanguage(lang);
             recreate();
         }
 
-        if (getString(R.string.theme_preference_key).equals(key)) {
+        // Caso Tema (Oscuro / Claro / Sistema)
+        if (key.equals(getString(R.string.theme_preference_key))) {
             String themeValue = sharedPreferences.getString(key, "system");
             applyTheme(themeValue);
             recreate();

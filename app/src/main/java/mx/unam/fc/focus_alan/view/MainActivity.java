@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,8 +24,12 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+
+import android.content.SharedPreferences;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
@@ -81,6 +88,12 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String lang = prefs.getString(getString(R.string.lang_preference_key), "es");
+        applyLanguage(lang);
+        String theme = prefs.getString(getString(R.string.theme_preference_key), "system");
+        applyTheme(theme);
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -92,6 +105,28 @@ public class MainActivity extends AppCompatActivity {
         updateTimerDisplay(timeLeftMillis);
         updateSessionDots();
         displayRandomQuote();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        android.content.SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+
+        String langEnPreferencias = prefs.getString(getString(R.string.lang_preference_key), "es");
+        String themeEnPreferencias = prefs.getString(getString(R.string.theme_preference_key), "system");
+
+        String langActual = getResources().getConfiguration().getLocales().get(0).getLanguage();
+
+        if (!langEnPreferencias.equals(langActual)) {
+            applyLanguage(langEnPreferencias);
+            applyTheme(themeEnPreferencias);
+
+            recreate();
+        } else {
+            applyTheme(themeEnPreferencias);
+        }
     }
 
     /**
@@ -241,8 +276,12 @@ public class MainActivity extends AppCompatActivity {
         if (currentMode == SessionMode.FOCUS) {
             focusSessionsCompleted++;
             currentMode = (focusSessionsCompleted >= SESSIONS_BEFORE_REST) ? SessionMode.REST : SessionMode.BREAK;
-            if (focusSessionsCompleted >= SESSIONS_BEFORE_REST) focusSessionsCompleted = 0;
-        } else {
+        } else if (currentMode == SessionMode.REST) {
+            focusSessionsCompleted = 0;
+            currentMode = SessionMode.FOCUS;
+            updateSessionDots();
+        }
+        else {
             currentMode = SessionMode.FOCUS;
         }
         currentSession.setCompleted(true);
@@ -349,6 +388,9 @@ public class MainActivity extends AppCompatActivity {
         if (currentMode == SessionMode.FOCUS) {
             focusSessionsCompleted++;
             currentMode = (focusSessionsCompleted % 4 == 0) ? SessionMode.REST : SessionMode.BREAK;
+        } else if (currentMode == SessionMode.REST) {
+            focusSessionsCompleted = 0;
+            currentMode = SessionMode.FOCUS;
         } else {
             currentMode = SessionMode.FOCUS;
         }
@@ -424,6 +466,41 @@ public class MainActivity extends AppCompatActivity {
         if (tvQuote != null) {
             // Usamos la frase que definiste en strings.xml
             tvQuote.setText(R.string.quote);
+        }
+    }
+
+
+    /**
+     * Aplica el idioma de la aplicación según la preferencia del usuario.
+     * @param langCode Código del idioma (es, en, etc.)
+     */
+    private void applyLanguage(String langCode) {
+        Locale locale = new Locale(langCode);
+        Locale.setDefault(locale);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.setLocale(locale);
+        res.updateConfiguration(conf, dm);
+    }
+
+
+    /**
+     * Aplica el modo oscuro o claro según la preferencia del usuario.
+     * @param themeValue Valores esperados: "light", "dark" o "system".
+     */
+    private void applyTheme(String themeValue) {
+        switch (themeValue) {
+            case "light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            default:
+                // Sigue la configuración del sistema operativo
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
         }
     }
 }
